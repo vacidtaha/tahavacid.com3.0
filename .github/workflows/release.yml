@@ -25,7 +25,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build the project
+        run: npm run build
+
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release --debug
+
+      - name: Deploy to VPS and restart PM2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          script: |
+            cd /var/www/tahavacid.com
+            git pull origin main
+            npm ci
+            npm run build
+            pm2 restart tahavacid.com
