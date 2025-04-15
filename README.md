@@ -40,5 +40,5 @@ Bu proje, semantic-release kullanarak otomatik sürümleme sistemini kullanmakta
 
 ## Lisans
 
-Tüm hakları saklıdır. Yeni deploy testi
-🧪 Bu bir otomatik deploy testidir
+Tüm hakları saklıdır.
+
