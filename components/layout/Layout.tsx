@@ -1,0 +1,39 @@
+import React, { useState, useEffect } from 'react';
+import Header from './Header';
+
+// Ana layout bileşeni - Header ve içeriği bir araya getirir
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Header'dan gelen menü durumunu dinle
+  useEffect(() => {
+    const handleMenuToggle = (e: CustomEvent) => {
+      setIsMenuOpen(e.detail.isOpen);
+    };
+
+    window.addEventListener('menuToggle', handleMenuToggle as EventListener);
+    
+    return () => {
+      window.removeEventListener('menuToggle', handleMenuToggle as EventListener);
+    };
+  }, []);
+
+  return (
+    <div className="flex flex-col min-h-screen bg-black text-white overflow-x-hidden">
+      <Header />
+      
+      {/* Ana içerik - sadece masaüstünde menü açıkken sola kayar */}
+      <div 
+        className={`flex flex-col flex-grow transition-transform duration-500 ease-out ${
+          isMenuOpen ? 'sm:-translate-x-32' : 'translate-x-0'
+        }`}
+      >
+        <main className="flex-grow pt-16">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Layout; 
