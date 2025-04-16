@@ -170,7 +170,9 @@ const Header: React.FC = () => {
                   style={{
                     backgroundColor: '#212529',
                     color: '#ced4da',
+                    fontSize: '16px' // Prevents zoom on iOS
                   }}
+                  inputMode="search"
                 />
               </div>
             </form>
