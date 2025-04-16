@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/vacidtaha/tahavacid.com/compare/v1.3.1...v1.3.2) (2025-04-16)
+
+
+### Bug Fixes
+
+* json html sorunu çözüldü ([2aa5305](https://github.com/vacidtaha/tahavacid.com/commit/2aa53056cf2b17f2c3f85c6bc2a9cc3a88ddffc7))
+
 ## [1.3.1](https://github.com/vacidtaha/tahavacid.com/compare/v1.3.0...v1.3.1) (2025-04-16)
 
 
