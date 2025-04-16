@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app'
 import Layout from '../components/layout/Layout'
 import '../styles/globals.css'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 // Uygulama ana bileşeni
 export default function App({ Component, pageProps }: AppProps) {
@@ -36,9 +37,14 @@ export default function App({ Component, pageProps }: AppProps) {
   }
   
   return (
-    // Diğer tüm sayfaları Layout içinde render et
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <>
+      <Head>
+        <link rel="icon" href="/images/logo2.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </>
   )
 } 
