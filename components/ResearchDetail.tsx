@@ -23,12 +23,13 @@ const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
   const [scrolled, setScrolled] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [parsedContent, setParsedContent] = useState<EditorJSData | null>(null);
+  const [isHtmlContent, setIsHtmlContent] = useState(false);
 
   // İçeriği parse et
   useEffect(() => {
     try {
       if (typeof research.content === 'string') {
-        // String ise JSON olarak parse et
+        // String ise ilk JSON olarak parse etmeyi dene
         try {
           const contentObj = JSON.parse(research.content);
           console.log('İçerik başarıyla parse edildi:', contentObj);
@@ -36,13 +37,17 @@ const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
           // EditorJS formatını doğrula
           if (contentObj && contentObj.blocks && Array.isArray(contentObj.blocks)) {
             setParsedContent(contentObj as EditorJSData);
+            setIsHtmlContent(false);
           } else {
             console.error('İçerik EditorJS formatında değil:', contentObj);
-            // Hatalı format durumunda null döndür
+            // JSON formatında değilse HTML olabilir
+            setIsHtmlContent(true);
             setParsedContent(null);
           }
         } catch (parseError) {
           console.error('JSON parse hatası:', parseError);
+          // Parse hatası varsa, içerik muhtemelen HTML formatında
+          setIsHtmlContent(true);
           setParsedContent(null);
         }
       } else if (typeof research.content === 'object') {
@@ -52,17 +57,21 @@ const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
         const contentObj = research.content as any;
         if (contentObj && contentObj.blocks && Array.isArray(contentObj.blocks)) {
           setParsedContent(contentObj as EditorJSData);
+          setIsHtmlContent(false);
         } else {
           console.error('İçerik EditorJS formatında değil:', research.content);
+          setIsHtmlContent(false);
           setParsedContent(null);
         }
       } else {
         console.error('İçerik ne string ne de obje:', typeof research.content);
+        setIsHtmlContent(false);
         setParsedContent(null);
       }
     } catch (error) {
       console.error('İçerik parse edilirken hata oluştu:', error);
       // Hata durumunda ham içeriği string olarak göster
+      setIsHtmlContent(false);
       setParsedContent(null);
     }
   }, [research.content]);
@@ -133,6 +142,8 @@ const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
           <div className="prose prose-invert prose-lg max-w-none [&_a]:!text-white [&_a]:!no-underline [&_a:hover]:!text-white [&_a:visited]:!text-white [&_a:active]:!text-white">
             {parsedContent ? (
               <EditorRenderer data={parsedContent} />
+            ) : isHtmlContent ? (
+              <div dangerouslySetInnerHTML={{ __html: typeof research.content === 'string' ? research.content : '' }} />
             ) : (
               <div className="text-red-500 bg-red-100 p-4 rounded-md mb-4">
                 <h3 className="font-bold">İçerik Görüntüleme Hatası</h3>

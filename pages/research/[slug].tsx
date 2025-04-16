@@ -31,6 +31,7 @@ export default function ResearchDetailPage({ research }: ResearchDetailPageProps
       <Head>
         <title>{research.title} | Vacid Araştırmaları</title>
         <meta name="description" content={research.description} />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" />
       </Head>
       
       {/* ResearchDetail bileşenini kullan */}
