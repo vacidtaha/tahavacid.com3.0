@@ -27,10 +27,10 @@ const nextConfig = {
             value: `
               default-src 'self';
               script-src 'self' 'unsafe-inline' 'unsafe-eval';
-              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
               font-src 'self' https://fonts.gstatic.com;
-              img-src 'self' data: blob: https://vzqhhmuttflqirejiupw.supabase.co;
-              connect-src 'self' https://vzqhhmuttflqirejiupw.supabase.co;
+              img-src 'self' data: blob: https://vzqhhmuttflqirejiupw.supabase.co/storage/v1/object/public/images/ https://vzqhhmuttflqirejiupw.supabase.co;
+              connect-src 'self' https://vzqhhmuttflqirejiupw.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com;
             `.replace(/\s+/g, ' ').trim()
           }
         ]
