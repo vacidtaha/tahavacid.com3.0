@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/vacidtaha/tahavacid.com/compare/v1.1.2...v1.2.0) (2025-04-16)
+
+
+### Features
+
+* login uı düzenlendi ([3d56ddc](https://github.com/vacidtaha/tahavacid.com/commit/3d56ddc70d721b7947f0109cfa231f7ad9e6deb1))
+
 ## [1.1.2](https://github.com/vacidtaha/tahavacid.com/compare/v1.1.1...v1.1.2) (2025-04-16)
 
 
