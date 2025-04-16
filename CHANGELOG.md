@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/vacidtaha/tahavacid.com/compare/v1.0.2...v1.0.3) (2025-04-16)
+
+
+### Bug Fixes
+
+* ssh script adımları log kontrollü hale getirildi ([818f27e](https://github.com/vacidtaha/tahavacid.com/commit/818f27ef48fc3942fb5217fa890967a73739810e))
+
 ## [1.0.2](https://github.com/vacidtaha/tahavacid.com/compare/v1.0.1...v1.0.2) (2025-04-16)
 
 
