@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/vacidtaha/tahavacid.com/compare/v1.1.0...v1.1.1) (2025-04-16)
+
+
+### Bug Fixes
+
+* script bloğu indentation düzeltildi ([24c24c2](https://github.com/vacidtaha/tahavacid.com/commit/24c24c22c72279685c3c78b7f7584e09b2272704))
+
 # [1.1.0](https://github.com/vacidtaha/tahavacid.com/compare/v1.0.2...v1.1.0) (2025-04-16)
 
 
