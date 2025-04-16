@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { getCurrentUser, getResearches, deleteResearch, subscribeToResearches } from '../../../lib/supabase';
+import Link from 'next/link';
+import { getCurrentUser, getResearches, deleteResearch, subscribeToResearches, signOut } from '../../../lib/supabase';
 import { Research } from '../../../lib/supabase';
 
 export default function ResearchList() {
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
   const [researches, setResearches] = useState<Research[]>([]);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -27,6 +29,8 @@ export default function ResearchList() {
           router.push('/admin/login');
           return;
         }
+        
+        setUser(currentUser);
         
         // URL parametrelerini kontrol et
         const { status } = router.query;
@@ -111,6 +115,16 @@ export default function ResearchList() {
     }
   };
   
+  // Çıkış yapma işlemi
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push('/admin/login');
+    } catch (error) {
+      console.error('Çıkış yapılırken hata:', error);
+    }
+  };
+  
   // Tarih formatı
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -124,10 +138,10 @@ export default function ResearchList() {
   // Yükleniyor durumu
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full border-4 border-blue-600 border-t-transparent animate-spin mb-4"></div>
-          <p className="text-gray-300">Yükleniyor...</p>
+          <div className="w-12 h-12 rounded-full border-4 border-black border-t-transparent animate-spin mb-4"></div>
+          <p className="text-gray-700">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -136,240 +150,246 @@ export default function ResearchList() {
   return (
     <>
       <Head>
-        <title>Araştırma Listesi | Vacid Admin</title>
-        <meta name="description" content="Vacid araştırma listesi" />
+        <title>Yayın Listesi | Taha Vacid</title>
+        <meta name="description" content="Taha Vacid yayın listesi" />
       </Head>
       
-      <div className="min-h-screen bg-black">
-        {/* Arkaplan gradient */}
-        <div className="fixed inset-0 bg-gradient-to-b from-gray-900 via-black to-black opacity-60 z-0"></div>
-        
-        {/* Header */}
-        <header className="sticky top-0 z-10 backdrop-blur-sm bg-gray-900/80 border-b border-gray-800 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-tr from-blue-600 to-indigo-800 rounded-md flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
-              </div>
-              <h1 className="text-xl font-bold text-white tracking-tight">Vacid Admin</h1>
+      <div className="flex h-screen bg-gray-50">
+        {/* Sol Yan Menü */}
+        <div className="w-64 bg-black text-white h-full flex flex-col shadow-xl rounded-tr-3xl rounded-br-3xl">
+          <div className="p-4 border-b border-gray-800 flex items-center space-x-3">
+            <div className="w-8 h-8 bg-white rounded-md flex items-center justify-center">
+              <span className="text-black font-bold text-sm">TV</span>
             </div>
-            
-            <button
-              onClick={() => router.push('/admin/dashboard')}
-              className="px-3 py-1.5 text-sm text-white bg-gradient-to-r from-gray-700 to-gray-800 rounded-md hover:from-gray-600 hover:to-gray-700 transition-all duration-200 flex items-center"
-            >
-              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-              </svg>
-              Panele Dön
-            </button>
+            <h1 className="text-lg font-bold text-white">Taha Vacid</h1>
           </div>
-        </header>
-        
-        {/* Ana içerik */}
-        <main className="relative z-1 max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl shadow-xl border border-gray-800 p-6 mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Araştırma Listesi</h2>
-                <p className="text-gray-400">Mevcut araştırma içeriklerinizi yönetin. ({researches.length} araştırma)</p>
-              </div>
-              <button
-                onClick={() => router.push('/admin/research/new')}
-                className="mt-4 sm:mt-0 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-md hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center justify-center w-full sm:w-auto"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          
+          <nav className="flex-1">
+            <div className="px-2 py-4">
+              <Link href="/admin/dashboard" className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-[#212529] rounded-md">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h2"></path>
+                </svg>
+                <span>Dashboard</span>
+              </Link>
+              
+              <Link href="/admin/research/list" className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-[#212529] rounded-md mt-1 bg-[#212529]">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                <span>Yayınlar</span>
+              </Link>
+              
+              <Link href="/admin/research/new" className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-[#212529] rounded-md mt-1">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
-                Yeni Araştırma Ekle
+                <span>Yeni Ekle</span>
+              </Link>
+            </div>
+          </nav>
+          
+          <div className="p-4 border-t border-gray-800">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                  <span className="text-sm text-white font-medium">{user?.email?.charAt(0).toUpperCase()}</span>
+                </div>
+                <div className="text-sm text-gray-300 truncate max-w-[120px]">
+                  {user?.email}
+                </div>
+              </div>
+              <button
+                onClick={handleSignOut}
+                className="text-gray-300 hover:text-white"
+                title="Çıkış Yap"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
               </button>
             </div>
           </div>
-          
-          {/* Bildirimler */}
-          {error && (
-            <div className="mb-6 bg-red-900/50 border border-red-800 text-red-200 px-4 py-3 rounded-md">
-              <p>{error}</p>
-            </div>
-          )}
-          
-          {success && (
-            <div className="mb-6 bg-green-900/50 border border-green-800 text-green-200 px-4 py-3 rounded-md">
-              <p>{success}</p>
-            </div>
-          )}
-          
-          {/* Araştırma listesi */}
-          <div className="bg-gray-900 rounded-lg shadow-xl border border-gray-800 overflow-hidden">
-            {researches.length === 0 ? (
-              <div className="p-8 text-center">
-                <svg className="w-16 h-16 text-gray-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </div>
+        
+        {/* Sağ İçerik Alanı */}
+        <div className="flex-1 overflow-auto rounded-tl-3xl rounded-bl-3xl bg-white">
+          <div className="p-8">
+            {/* Başlık ve Ekleme Butonu */}
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-2xl font-bold text-gray-800">Yayın Listesi</h1>
+              <Link href="/admin/research/new" className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-md inline-flex items-center space-x-2 transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
-                <h3 className="text-xl font-medium text-gray-400 mb-2">Henüz araştırma bulunmuyor</h3>
-                <p className="text-gray-500 mb-6">İlk araştırmanızı eklemek için "Yeni Araştırma Ekle" butonuna tıklayın.</p>
-                <button
-                  onClick={() => router.push('/admin/research/new')}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-md hover:from-blue-700 hover:to-blue-800 transition-all duration-200 inline-flex items-center"
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  Yeni Araştırma Ekle
-                </button>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full divide-y divide-gray-800">
-                  <thead className="bg-gray-900">
-                    <tr>
-                      <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                        Başlık
-                      </th>
-                      {researches.some(r => r.category) && (
-                        <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                          Kategori
-                        </th>
-                      )}
-                      <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                        Tarih
-                      </th>
-                      <th scope="col" className="px-6 py-4 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
-                        İşlemler
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-gray-900 divide-y divide-gray-800">
-                    {researches.map((research) => (
-                      <tr key={research.id} className="hover:bg-gray-800/50 transition-colors duration-150">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                          <div className="flex items-center space-x-3">
-                            <div className="flex-shrink-0 w-10 h-10 rounded bg-gray-800 flex items-center justify-center">
-                              <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                              </svg>
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-white">{research.title}</div>
-                              <div className="text-sm text-gray-400 truncate max-w-xs">{research.description?.substring(0, 60) || ''}...</div>
-                            </div>
-                          </div>
-                        </td>
-                        {researches.some(r => r.category) && (
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                            {research.category ? (
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-900 text-blue-200">
-                                {research.category}
-                              </span>
-                            ) : (
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-800 text-gray-400">
-                                Kategorisiz
-                              </span>
-                            )}
-                          </td>
-                        )}
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                          {formatDate(research.created_at)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex items-center justify-end space-x-3">
-                            <button
-                              onClick={() => router.push(`/research/${research.slug}`)}
-                              className="text-indigo-400 hover:text-indigo-300 transition-colors duration-150"
-                              title="Görüntüle"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => router.push(`/admin/research/edit/${research.id}`)}
-                              className="text-blue-400 hover:text-blue-300 transition-colors duration-150"
-                              title="Düzenle"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(research.id)}
-                              className="text-red-400 hover:text-red-300 transition-colors duration-150"
-                              title="Sil"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                              </svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <span>Yeni Ekle</span>
+              </Link>
+            </div>
+
+            {/* Bildirimler */}
+            {error && (
+              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg text-red-700 px-4 py-3">
+                <p>{error}</p>
               </div>
             )}
+            
+            {success && (
+              <div className="mb-6 bg-green-50 border border-green-200 rounded-lg text-green-700 px-4 py-3">
+                <p>{success}</p>
+              </div>
+            )}
+            
+            {/* Araştırma listesi */}
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800">Tüm Yayınlar ({researches.length})</h2>
+              </div>
+              
+              {researches.length === 0 ? (
+                <div className="p-8 text-center">
+                  <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  <h3 className="text-xl font-medium text-gray-500 mb-2">Henüz yayın bulunmuyor</h3>
+                  <p className="text-gray-400 mb-6">İlk yayınınızı eklemek için "Yeni Ekle" butonuna tıklayın.</p>
+                  <Link href="/admin/research/new" className="bg-black text-white rounded-lg px-4 py-2 inline-flex items-center space-x-2 hover:bg-gray-800 transition-colors">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    <span>Yeni Yayın Ekle</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Başlık
+                        </th>
+                        {researches.some(r => r.category) && (
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Kategori
+                          </th>
+                        )}
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Tarih
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          İşlemler
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {researches.map((research) => (
+                        <tr key={research.id} className="hover:bg-gray-50 transition-colors duration-150">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                              </div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900">{research.title}</div>
+                                <div className="text-sm text-gray-500 truncate max-w-md">{research.description?.substring(0, 60)}...</div>
+                              </div>
+                            </div>
+                          </td>
+                          {researches.some(r => r.category) && (
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                {research.category || "Genel"}
+                              </span>
+                            </td>
+                          )}
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {formatDate(research.created_at)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex justify-end space-x-3">
+                              <Link href={`/research/${research.slug}`} target="_blank" className="text-indigo-600 hover:text-indigo-900">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                              </Link>
+                              <Link href={`/admin/research/edit/${research.id}`} className="text-blue-600 hover:text-blue-900">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                              </Link>
+                              <button onClick={() => handleDeleteClick(research.id)} className="text-red-600 hover:text-red-900">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
-        </main>
-        
-        {/* Footer */}
-        <footer className="relative z-1 mt-auto border-t border-gray-800 py-6">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="text-center text-xs text-gray-500">
-              © {new Date().getFullYear()} Vacid | Tüm hakları saklıdır
-            </p>
-          </div>
-        </footer>
+        </div>
       </div>
       
-      {/* Silme onay modalı */}
+      {/* Silme Onay Modalı */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-30 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center">
-            <div className="fixed inset-0 bg-black opacity-75 transition-opacity"></div>
-            
-            <div className="relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle bg-gray-900 rounded-lg shadow-xl border border-gray-800 transform transition-all">
-              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-100">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                </svg>
-              </div>
-              
-              <div className="text-center mb-6">
-                <h3 className="text-lg font-medium leading-6 text-white mb-2">
-                  Araştırma Silinecek
-                </h3>
-                <p className="text-sm text-gray-400">
-                  Bu işlem geri alınamaz. Bu araştırmayı silmek istediğinizden emin misiniz?
-                </p>
-              </div>
-              
-              <div className="flex justify-center space-x-4">
-                <button
-                  type="button"
-                  onClick={handleCancelDelete}
-                  className="px-4 py-2 bg-gray-800 border border-gray-600 text-gray-300 rounded-md hover:bg-gray-700 transition-colors duration-200"
-                >
-                  İptal
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmDelete}
-                  disabled={deleteLoading}
-                  className={`px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-md hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center ${deleteLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
-                >
-                  {deleteLoading ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Siliniyor...
-                    </>
-                  ) : (
-                    'Evet, Sil'
-                  )}
-                </button>
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm transition-opacity"></div>
+          
+          <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+            <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:max-w-lg sm:w-full">
+              <div className="bg-white px-6 py-6">
+                <div className="flex items-center mb-5">
+                  <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0">
+                    <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-lg font-medium leading-6 text-gray-900">Yayını silmek istediğinizden emin misiniz?</h3>
+                  </div>
+                </div>
+                
+                <div className="mt-3">
+                  <p className="text-sm text-gray-500">
+                    Bu işlem geri alınamaz. Yayınınız kalıcı olarak silinecek ve bir daha erişilemeyecektir.
+                  </p>
+                </div>
+                
+                <div className="mt-6 flex items-center justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={handleCancelDelete}
+                    disabled={deleteLoading}
+                    className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#dee2e6] focus:ring-offset-2 transition-colors duration-200"
+                  >
+                    İptal
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmDelete}
+                    disabled={deleteLoading}
+                    className="inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200"
+                  >
+                    {deleteLoading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Siliniyor...</span>
+                      </>
+                    ) : (
+                      <span>Evet, sil</span>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

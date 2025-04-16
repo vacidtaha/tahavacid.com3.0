@@ -2,9 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
-import { getCurrentUser, addResearch, signOut } from '../../../lib/supabase';
+import { getCurrentUser, updateResearch, signOut, Research } from '../../../../lib/supabase';
 
-export default function NewResearch() {
+// Belirli bir ID'ye göre araştırma getirme
+async function getResearchById(id: string): Promise<Research | null> {
+  try {
+    const response = await fetch(`/api/research/${id}`);
+    if (!response.ok) {
+      throw new Error('Yayın getirilemedi');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Yayın detayları alınırken hata:', error);
+    return null;
+  }
+}
+
+export default function EditResearch() {
   // Form state'leri
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -16,8 +30,10 @@ export default function NewResearch() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [research, setResearch] = useState<Research | null>(null);
   
   const router = useRouter();
+  const { id } = router.query;
   
   // Başlık değiştiğinde otomatik slug oluşturma
   useEffect(() => {
@@ -48,15 +64,16 @@ export default function NewResearch() {
         .replace(/^-+|-+$/g, ''); // Başlangıç ve sondaki tireleri kaldır
     };
     
-    if (title) {
+    if (title && !research?.slug) {
       setSlug(slugify(title));
     }
-  }, [title]);
+  }, [title, research]);
   
-  // Sayfa yüklendiğinde kullanıcı kontrolü
+  // Sayfa yüklendiğinde kullanıcı kontrolü ve araştırma verilerini getirme
   useEffect(() => {
-    async function loadUser() {
+    async function loadData() {
       try {
+        // Kullanıcı kontrolü
         const currentUser = await getCurrentUser();
         
         if (!currentUser) {
@@ -66,20 +83,44 @@ export default function NewResearch() {
         }
         
         setUser(currentUser);
+        
+        // ID mevcutsa araştırma verilerini getir
+        if (id) {
+          const researchData = await getResearchById(id as string);
+          
+          if (!researchData) {
+            setError('Yayın bulunamadı');
+            return;
+          }
+          
+          setResearch(researchData);
+          setTitle(researchData.title);
+          setDescription(researchData.description || '');
+          setContent(researchData.content);
+          setCategory(researchData.category || '');
+          setSlug(researchData.slug);
+        }
       } catch (error) {
-        console.error('Kullanıcı bilgisi alınırken hata:', error);
-        router.push('/admin/login');
+        console.error('Veri yüklenirken hata:', error);
+        setError('Veri yüklenirken bir hata oluştu');
       } finally {
         setLoading(false);
       }
     }
 
-    loadUser();
-  }, [router]);
+    if (router.isReady) {
+      loadData();
+    }
+  }, [router.isReady, id, router]);
   
-  // Araştırmayı kaydetme fonksiyonu
+  // Araştırmayı güncelleme fonksiyonu
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!id) {
+      setError('Yayın ID bulunamadı');
+      return;
+    }
     
     // Form doğrulama - sadece başlık ve içerik zorunlu olsun
     if (!title || !content) {
@@ -95,36 +136,30 @@ export default function NewResearch() {
       const finalSlug = slug || title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       
       // Araştırmayı Supabase'e kaydet - sadece mevcut alanları gönder
-      const researchData: any = {
+      const updateData: any = {
         title,
         content,
         slug: finalSlug,
       };
       
       // Opsiyonel alanları sadece doluysa ekle
-      if (description) researchData.description = description;
-      if (category) researchData.category = category;
+      if (description) updateData.description = description;
+      if (category) updateData.category = category;
       
-      const result = await addResearch(researchData);
+      const result = await updateResearch(id as string, updateData);
       
       if (result) {
         setSuccess(true);
-        // Formu temizle
-        setTitle('');
-        setDescription('');
-        setContent('');
-        setCategory('');
-        setSlug('');
         
         // 2 saniye sonra araştırma listesi sayfasına yönlendir
         setTimeout(() => {
           setSuccess(false);
           // Başarılı mesajı ile birlikte liste sayfasına yönlendir
-          router.push('/admin/research/list?status=added');
+          router.push('/admin/research/list?status=updated');
         }, 2000);
       }
     } catch (err: any) {
-      console.error('Kayıt hatası:', err);
+      console.error('Güncelleme hatası:', err);
       
       // Oturum hatası ise login sayfasına yönlendir
       if (err.message && err.message.includes('Oturum süresi dolmuş')) {
@@ -165,8 +200,8 @@ export default function NewResearch() {
   return (
     <>
       <Head>
-        <title>Yeni Yayın Ekle | Taha Vacid</title>
-        <meta name="description" content="Taha Vacid yayın ekleme sayfası" />
+        <title>Yayın Düzenle | Taha Vacid</title>
+        <meta name="description" content="Taha Vacid yayın düzenleme sayfası" />
       </Head>
       
       <div className="flex h-screen bg-gray-50">
@@ -188,14 +223,14 @@ export default function NewResearch() {
                 <span>Dashboard</span>
               </Link>
               
-              <Link href="/admin/research/list" className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-[#212529] rounded-md mt-1">
+              <Link href="/admin/research/list" className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-[#212529] rounded-md mt-1 bg-[#212529]">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
                 <span>Yayınlar</span>
               </Link>
               
-              <Link href="/admin/research/new" className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-[#212529] rounded-md mt-1 bg-[#212529]">
+              <Link href="/admin/research/new" className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-[#212529] rounded-md mt-1">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
@@ -232,7 +267,7 @@ export default function NewResearch() {
           <div className="p-8">
             {/* Başlık */}
             <div className="flex items-center justify-between mb-8">
-              <h1 className="text-2xl font-bold text-gray-800">Yeni Yayın Ekle</h1>
+              <h1 className="text-2xl font-bold text-gray-800">Yayın Düzenle</h1>
               <Link href="/admin/research/list" className="text-gray-600 hover:text-black font-medium py-2 px-4 rounded-md inline-flex items-center space-x-2 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -250,7 +285,7 @@ export default function NewResearch() {
             
             {success && (
               <div className="mb-6 bg-green-50 border border-green-200 rounded-lg text-green-700 px-4 py-3">
-                <p>Yayın başarıyla kaydedildi!</p>
+                <p>Yayın başarıyla güncellendi!</p>
               </div>
             )}
             
@@ -366,7 +401,7 @@ export default function NewResearch() {
                         Kaydediliyor...
                       </>
                     ) : (
-                      'Yayını Kaydet'
+                      'Değişiklikleri Kaydet'
                     )}
                   </button>
                 </div>
