@@ -35,7 +35,7 @@ export default function Login() {
   return (
     <>
       <Head>
-        <title>Admin Girişi | Taha Vacid</title>
+        <title>Kurucu Üye Girişi | Taha Vacid</title>
         <meta name="description" content="Taha Vacid admin paneli giriş" />
       </Head>
       
@@ -58,7 +58,7 @@ export default function Login() {
         <div className="w-full md:w-1/2 bg-white flex items-center justify-center p-6 md:rounded-tl-3xl md:rounded-bl-3xl">
           <div className="w-full max-w-md space-y-8">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900">Admin Girişi</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Kurucu Üye Girişi</h1>
               <p className="mt-2 text-gray-600">Hesabınıza giriş yapın</p>
             </div>
             

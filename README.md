@@ -41,4 +41,4 @@ Bu proje, semantic-release kullanarak otomatik sürümleme sistemini kullanmakta
 ## Lisans
 
 Tüm hakları saklıdır.
-
+.
