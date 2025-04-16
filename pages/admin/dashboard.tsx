@@ -63,8 +63,8 @@ export default function Dashboard() {
         {/* Arkaplan gradient */}
         <div className="fixed inset-0 bg-gradient-to-b from-gray-900 via-black to-black opacity-60 z-0"></div>
         
-        {/* Header */}
-        <header className="sticky top-0 z-10 backdrop-blur-sm bg-gray-900/80 border-b border-gray-800 shadow-lg">
+        {/* Üst bilgi çubuğu */}
+        <div className="sticky top-0 z-10 backdrop-blur-sm bg-gray-900/80 border-b border-gray-800 shadow-lg">
           <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-tr from-blue-600 to-indigo-800 rounded-md flex items-center justify-center">
@@ -91,7 +91,7 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
-        </header>
+        </div>
         
         {/* Ana içerik */}
         <main className="relative z-1 max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">

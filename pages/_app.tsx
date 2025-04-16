@@ -8,8 +8,9 @@ import { useRouter } from 'next/router'
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   
-  // Eğer araştırma detay sayfası ise Layout kullanma
+  // Eğer araştırma detay sayfası veya admin sayfası ise Layout kullanma
   const isResearchDetailPage = router.pathname.startsWith('/research/[slug]');
+  const isAdminPage = router.pathname.startsWith('/admin');
   const isHomePage = router.pathname === '/';
   
   // Sadece ana sayfada mobil cihazlarda scrolling'i engelle
@@ -29,7 +30,8 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, [isHomePage]);
   
-  if (isResearchDetailPage) {
+  // Admin sayfaları veya araştırma detay sayfalarında Layout kullanma
+  if (isResearchDetailPage || isAdminPage) {
     return <Component {...pageProps} />;
   }
   
