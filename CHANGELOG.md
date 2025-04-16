@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/vacidtaha/tahavacid.com/compare/v1.3.0...v1.3.1) (2025-04-16)
+
+
+### Bug Fixes
+
+* görsel ve font yükleme sorunu çözüldü ([2ea6994](https://github.com/vacidtaha/tahavacid.com/commit/2ea6994c5e9afd9e5d7f615892a99965d3699ce8))
+
 # [1.3.0](https://github.com/vacidtaha/tahavacid.com/compare/v1.2.0...v1.3.0) (2025-04-16)
 
 
