@@ -77,4 +77,18 @@ export interface EditorJSChecklistData {
     text: string;
     checked: boolean;
   }[];
-} 
+}
+
+// Standart boş içerik şablonu
+export const EMPTY_EDITOR_DATA: EditorJSData = {
+  time: new Date().getTime(),
+  blocks: [
+    {
+      type: "paragraph",
+      data: {
+        text: ""
+      }
+    }
+  ],
+  version: "2.28.2"
+}; 

@@ -67,29 +67,29 @@ const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
     }
   }, [research.content]);
 
-  // Sayfa scroll edildiğinde geri düğmesini göster/gizle
+  // Scroll olayları
   useEffect(() => {
     const handleScroll = () => {
-      // Çok az kaydırma olduğunda bile geri düğmesini göster
-      const isScrolled = window.scrollY > 20;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
+      if (containerRef.current) {
+        const position = containerRef.current.getBoundingClientRect().top;
+        setScrolled(position < 0);
       }
     };
 
-    // Scroll event listener ekle
     window.addEventListener('scroll', handleScroll);
-    
-    // Component unmount olunca listener'ı temizle
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [scrolled]);
+  }, []);
 
-  // Tarihi formatla (örn: 15 Nisan 2023)
+  // Tarih formatlayıcı
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+    return new Intl.DateTimeFormat('tr-TR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(date);
   };
 
   return (

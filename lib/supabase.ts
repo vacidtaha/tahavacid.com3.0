@@ -278,9 +278,25 @@ export async function updateResearchContent(id: string, content: any) {
       }
     }
 
+    // İçeriği string mi yoksa obje mi kontrol et ve doğru şekilde kaydet
+    let contentToSave;
+    if (typeof content === 'string') {
+      try {
+        // Zaten JSON string ise geçerli olduğundan emin ol
+        JSON.parse(content);
+        contentToSave = content;
+      } catch (error) {
+        // JSON formatında değilse JSON'a çevir
+        contentToSave = JSON.stringify(content);
+      }
+    } else {
+      // Obje ise JSON string'e çevir
+      contentToSave = JSON.stringify(content);
+    }
+
     const { data, error } = await supabase
       .from('researches')
-      .update({ content: JSON.stringify(content) })
+      .update({ content: contentToSave })
       .eq('id', id)
       .select();
 
@@ -329,8 +345,21 @@ export async function addResearchWithJsonContent(research: Partial<Omit<Research
       }
     }
 
-    // JSON formatında içeriği string olarak kaydet
-    const jsonContent = JSON.stringify(editorContent);
+    // İçeriği doğru formatta hazırla
+    let jsonContent;
+    if (typeof editorContent === 'string') {
+      try {
+        // Zaten JSON string ise geçerli olduğundan emin ol
+        JSON.parse(editorContent);
+        jsonContent = editorContent;
+      } catch (error) {
+        // JSON formatında değilse JSON'a çevir
+        jsonContent = JSON.stringify(editorContent);
+      }
+    } else {
+      // Obje ise JSON string'e çevir
+      jsonContent = JSON.stringify(editorContent);
+    }
 
     const { data, error } = await supabase
       .from('researches')
