@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/vacidtaha/tahavacid.com/compare/v1.1.1...v1.1.2) (2025-04-16)
+
+
+### Bug Fixes
+
+* araştırma detay sayfası buton doğru konumlandırıldı ayrıca menü iyileştirildi ([51c4580](https://github.com/vacidtaha/tahavacid.com/commit/51c45806a998b1ecc34c6e2b00a3026fdfde5d9b))
+
 ## [1.1.1](https://github.com/vacidtaha/tahavacid.com/compare/v1.1.0...v1.1.1) (2025-04-16)
 
 
