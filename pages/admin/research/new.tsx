@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
-import { getCurrentUser, addResearch, signOut } from '../../../lib/supabase';
+import { getCurrentUser, addResearchWithJsonContent, signOut } from '../../../lib/supabase';
+import Editor from '../../../components/editor/Editor';
+import { EditorJSData, EMPTY_EDITOR_DATA } from '../../../components/editor/EditorConfig';
+import { toast } from 'react-hot-toast';
 
 export default function NewResearch() {
   // Form state'leri
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [content, setContent] = useState('');
+  const [editorData, setEditorData] = useState<EditorJSData>(EMPTY_EDITOR_DATA);
   const [category, setCategory] = useState('');
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(true);
@@ -16,11 +19,17 @@ export default function NewResearch() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
   
   const router = useRouter();
   
   // Başlık değiştiğinde otomatik slug oluşturma
   useEffect(() => {
+    // Odak pozisyonunu alalım
+    const selectionStart = titleInputRef.current?.selectionStart;
+    const selectionEnd = titleInputRef.current?.selectionEnd;
+    const hasFocus = document.activeElement === titleInputRef.current;
+    
     // Türkçe karakterleri değiştirme ve boşlukları tire ile değiştirme
     const turkishToEnglish = (text: string) => {
       return text
@@ -51,6 +60,18 @@ export default function NewResearch() {
     if (title) {
       setSlug(slugify(title));
     }
+    
+    // Eğer başlık alanında odak varsa, state güncellemesinden sonra odağı geri alalım
+    if (hasFocus && titleInputRef.current) {
+      setTimeout(() => {
+        if (titleInputRef.current) {
+          titleInputRef.current.focus();
+          if (selectionStart !== undefined && selectionEnd !== undefined) {
+            titleInputRef.current.setSelectionRange(selectionStart, selectionEnd);
+          }
+        }
+      }, 0);
+    }
   }, [title]);
   
   // Sayfa yüklendiğinde kullanıcı kontrolü
@@ -77,13 +98,29 @@ export default function NewResearch() {
     loadUser();
   }, [router]);
   
+  // Editor içeriği değiştiğinde çağrılan fonksiyon - useCallback ile optimize edildi
+  const handleEditorChange = useCallback((data: EditorJSData) => {
+    setEditorData(data);
+  }, []);
+  
+  // Editor bileşenini memoize etmek - başlık değişiminde tekrar render edilmesini önlemek için
+  const MemoizedEditor = useMemo(() => (
+    <Editor 
+      data={editorData} 
+      onChange={handleEditorChange} 
+      autofocus={false}
+      placeholder="Yayın içeriğinizi buraya yazın..."
+      autoSave={false}
+    />
+  ), [editorData, handleEditorChange]);
+  
   // Araştırmayı kaydetme fonksiyonu
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Form doğrulama - sadece başlık ve içerik zorunlu olsun
-    if (!title || !content) {
-      setError('Lütfen en azından başlık ve içerik alanlarını doldurun.');
+    // Form doğrulama - başlık zorunlu
+    if (!title) {
+      setError('Lütfen en azından başlık alanını doldurun.');
       return;
     }
     
@@ -94,10 +131,16 @@ export default function NewResearch() {
       // Eğer slug boş ise otomatik oluştur
       const finalSlug = slug || title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       
-      // Araştırmayı Supabase'e kaydet - sadece mevcut alanları gönder
+      // Editor içeriğini kontrol et
+      if (!editorData || !editorData.blocks || editorData.blocks.length === 0) {
+        setError('İçerik boş olamaz. Lütfen içerik ekleyin.');
+        setSaving(false);
+        return;
+      }
+      
+      // Araştırmayı Supabase'e kaydet
       const researchData: any = {
         title,
-        content,
         slug: finalSlug,
       };
       
@@ -105,16 +148,18 @@ export default function NewResearch() {
       if (description) researchData.description = description;
       if (category) researchData.category = category;
       
-      const result = await addResearch(researchData);
+      const result = await addResearchWithJsonContent(researchData, editorData);
       
       if (result) {
         setSuccess(true);
         // Formu temizle
         setTitle('');
         setDescription('');
-        setContent('');
+        setEditorData(EMPTY_EDITOR_DATA);
         setCategory('');
         setSlug('');
+        
+        toast.success('Yayın başarıyla kaydedildi!');
         
         // 2 saniye sonra araştırma listesi sayfasına yönlendir
         setTimeout(() => {
@@ -134,6 +179,7 @@ export default function NewResearch() {
         }, 2000);
       } else {
         setError(`Bir hata oluştu: ${err.message || 'Bilinmeyen hata'}`);
+        toast.error(`Kayıt hatası: ${err.message || 'Bilinmeyen hata'}`);
       }
     } finally {
       setSaving(false);
@@ -265,6 +311,7 @@ export default function NewResearch() {
                   <input
                     type="text"
                     id="title"
+                    ref={titleInputRef}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full border border-gray-300 rounded-md py-2 px-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#dee2e6] focus:border-[#dee2e6]"
@@ -325,23 +372,14 @@ export default function NewResearch() {
                   ></textarea>
                 </div>
                 
-                {/* İçerik */}
+                {/* EditorJS İçerik Editörü */}
                 <div>
-                  <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
                     İçerik
                   </label>
-                  <textarea
-                    id="content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    rows={15}
-                    className="w-full border border-gray-300 rounded-md py-2 px-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#dee2e6] focus:border-[#dee2e6]"
-                    placeholder="Yayın içeriği buraya yazılır"
-                    required
-                  ></textarea>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Markdown formatını destekler. Başlıklar için # işareti, kalın metin için ** işareti kullanabilirsiniz.
-                  </p>
+                  <div className="border border-gray-300 rounded-md overflow-hidden">
+                    {MemoizedEditor}
+                  </div>
                 </div>
                 
                 {/* Kaydet Butonları */}

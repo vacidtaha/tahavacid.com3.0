@@ -35,7 +35,7 @@ export default function Login() {
   return (
     <>
       <Head>
-        <title>Kurucu Üye Girişi | Taha Vacid</title>
+        <title>Kurucu Üye Girişi. | Taha Vacid</title>
         <meta name="description" content="Taha Vacid admin paneli giriş" />
       </Head>
       

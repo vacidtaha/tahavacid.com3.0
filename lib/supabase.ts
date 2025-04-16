@@ -181,3 +181,166 @@ export async function deleteResearch(id: string) {
     throw err;
   }
 }
+
+// Dosya yükleme fonksiyonu
+export async function uploadFile(file: File, bucket: string = 'images') {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      console.error('Kullanıcı oturumu bulunamadı');
+      throw new Error('Oturum süresi dolmuş olabilir, lütfen tekrar giriş yapın');
+    }
+
+    // Dosya adının benzersiz olması için timestamp ekliyoruz
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error('Dosya yüklenirken hata oluştu:', error);
+      throw error;
+    }
+
+    // Dosya URL'ini döndür
+    const { data: urlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(filePath);
+
+    return {
+      url: urlData.publicUrl,
+      path: filePath
+    };
+  } catch (err) {
+    console.error('Dosya yükleme hatası:', err);
+    throw err;
+  }
+}
+
+// Dosya silme fonksiyonu
+export async function deleteFile(filePath: string, bucket: string = 'images') {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      console.error('Kullanıcı oturumu bulunamadı');
+      throw new Error('Oturum süresi dolmuş olabilir, lütfen tekrar giriş yapın');
+    }
+
+    const { error } = await supabase.storage
+      .from(bucket)
+      .remove([filePath]);
+
+    if (error) {
+      console.error('Dosya silinirken hata oluştu:', error);
+      throw error;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Dosya silme hatası:', err);
+    throw err;
+  }
+}
+
+// Yayın içeriğinin JSON formatında güncellenmesi
+export async function updateResearchContent(id: string, content: any) {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      console.error('Kullanıcı oturumu bulunamadı');
+      throw new Error('Oturum süresi dolmuş olabilir, lütfen tekrar giriş yapın');
+    }
+    
+    // EditorJS veri kontrolü
+    if (content && typeof content === 'object') {
+      // Geçersiz blokları temizle
+      if (content.blocks && Array.isArray(content.blocks)) {
+        content.blocks = content.blocks.filter((block: any) => 
+          block && block.type && block.data !== undefined
+        );
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('researches')
+      .update({ content: JSON.stringify(content) })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('İçerik güncellenirken hata oluştu:', error);
+      throw error;
+    }
+
+    return data?.[0] || null;
+  } catch (err) {
+    console.error('İçerik güncelleme hatası:', err);
+    throw err;
+  }
+}
+
+// Araştırma ekleme fonksiyonunu JSON içerik desteği ile güncelle
+export async function addResearchWithJsonContent(research: Partial<Omit<Research, 'id' | 'created_at'>>, editorContent: any) {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      console.error('Kullanıcı oturumu bulunamadı');
+      throw new Error('Oturum süresi dolmuş olabilir, lütfen tekrar giriş yapın');
+    }
+
+    if (!research.title || !research.slug) {
+      throw new Error('Başlık ve slug zorunludur');
+    }
+    
+    // EditorJS veri kontrolü
+    if (editorContent && typeof editorContent === 'object') {
+      // Geçersiz blokları temizle
+      if (editorContent.blocks && Array.isArray(editorContent.blocks)) {
+        editorContent.blocks = editorContent.blocks.filter((block: any) => 
+          block && block.type && block.data !== undefined
+        );
+      }
+      
+      // Boş blokları kontrol et
+      if (!editorContent.blocks || editorContent.blocks.length === 0) {
+        // En azından boş bir paragraf bloğu ekle
+        editorContent.blocks = [{
+          type: 'paragraph',
+          data: { text: '' }
+        }];
+      }
+    }
+
+    // JSON formatında içeriği string olarak kaydet
+    const jsonContent = JSON.stringify(editorContent);
+
+    const { data, error } = await supabase
+      .from('researches')
+      .insert([{ 
+        ...research, 
+        content: jsonContent,
+        created_at: new Date().toISOString() 
+      }])
+      .select();
+
+    if (error) {
+      console.error('Araştırma eklenirken hata oluştu:', error);
+      throw error;
+    }
+
+    return data?.[0] || null;
+  } catch (err) {
+    console.error('Veri ekleme hatası:', err);
+    throw err;
+  }
+}
