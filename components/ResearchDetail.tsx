@@ -40,9 +40,9 @@ const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
   return (
     <article ref={containerRef} className="relative pb-16">
       {/* Geri düğmesi - Scroll edildiğinde görünür */}
-      <div className={`fixed md:left-8 md:top-1/2 left-4 top-16 md:transform md:-translate-y-1/2 z-20 transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <Link href="/research" className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-black bg-opacity-40 backdrop-blur-md rounded-full text-white hover:bg-opacity-60 transition-all">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6">
+      <div className={`fixed left-4 top-4 z-20 transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <Link href="/research" className="flex items-center justify-center w-10 h-10 bg-black bg-opacity-40 backdrop-blur-md rounded-full text-white hover:bg-opacity-60 transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
         </Link>

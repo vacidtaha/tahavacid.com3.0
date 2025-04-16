@@ -131,6 +131,15 @@ const Header: React.FC = () => {
         </button>
       </div>
 
+      {/* Overlay to close menu when clicking outside */}
+      {isMenuOpen && (
+        <div 
+          className="fixed inset-0 z-30 bg-transparent sm:hidden"
+          onClick={toggleMenu}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Modern Tam Ekran Menü - Mobilde soldan, masaüstünde sağdan açılır */}
       <div 
         className={`fixed top-0 h-full z-40 transform transition-all duration-500 ease-out 
