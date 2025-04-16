@@ -22,10 +22,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <div className="flex flex-col min-h-screen bg-black text-white overflow-hidden">
       <Header />
       
-      {/* Ana içerik - sadece masaüstünde menü açıkken sola kayar */}
+      {/* Ana içerik - menü açıkken sağa itilir, mobilde daha fazla, masaüstünde daha az */}
       <div 
-        className={`flex flex-col flex-grow transition-transform duration-500 ease-out ${
-          isMenuOpen ? 'sm:-translate-x-32' : 'translate-x-0'
+        className={`flex flex-col flex-grow transition-all duration-500 ease-out ${
+          isMenuOpen 
+            ? 'translate-x-[calc(100%-3.5rem)] blur-sm backdrop-blur-md sm:blur-0 sm:backdrop-blur-0 sm:-translate-x-32' 
+            : 'translate-x-0 blur-0'
         }`}
       >
         <main className="flex-grow pt-16">
