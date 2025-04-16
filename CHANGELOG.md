@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/vacidtaha/tahavacid.com/compare/v1.2.0...v1.3.0) (2025-04-16)
+
+
+### Features
+
+* büyük ölçüde editör tamamlandı ([12124df](https://github.com/vacidtaha/tahavacid.com/commit/12124df62a19780e0ec4842ddcb003ef1e5fce6b))
+
 # [1.2.0](https://github.com/vacidtaha/tahavacid.com/compare/v1.1.2...v1.2.0) (2025-04-16)
 
 
