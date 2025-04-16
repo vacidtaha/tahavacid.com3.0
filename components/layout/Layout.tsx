@@ -19,7 +19,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-black text-white overflow-hidden">
       <Header />
       
       {/* Ana içerik - sadece masaüstünde menü açıkken sola kayar */}

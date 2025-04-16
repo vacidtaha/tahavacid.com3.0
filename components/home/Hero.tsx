@@ -4,7 +4,7 @@ import Image from 'next/image';
 // Hero bileşeni - Anasayfanın üst kısmındaki tam sayfa hero alanı
 const Hero: React.FC = () => {
   return (
-    <div className="bg-black min-h-[70vh] flex items-center justify-center">
+    <div className="fixed inset-0 bg-black flex items-center justify-center touch-none">
       {/* Ortada logo2 */}
       <div className="text-center">
         <Image
@@ -20,4 +20,4 @@ const Hero: React.FC = () => {
   );
 };
 
-export default Hero; 
+export default Hero;
