@@ -121,25 +121,24 @@ const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
         </div>
       </div>
 
-      {/* Resim */}
-      {research.image_url && (
-        <div className="bg-black">
-          <div className="container mx-auto max-w-3xl px-4">
-            <div className="mb-8 rounded-xl overflow-hidden">
+      {/* İçerik bölümü - Farklı düzen */}
+      <div className="bg-black">
+        {/* Resim bölümü - Tam ekran genişliğinde */}
+        {research.image_url && (
+          <div className="w-full px-0 mb-10">
+            <div className="overflow-hidden">
               <img 
                 src={research.image_url} 
                 alt={research.title} 
-                className="w-full object-cover max-h-96"
+                className="w-full object-cover h-auto max-h-[500px]"
               />
             </div>
           </div>
-        </div>
-      )}
-
-      {/* İçerik alanı - Metin boyutu büyütüldü ve sınırları genişletildi */}
-      <div className="bg-black">
-        <div className="container mx-auto max-w-4xl px-6 sm:px-10 py-14">
-          <div className="prose prose-invert prose-lg max-w-none [&_a]:!text-white [&_a]:!no-underline [&_a:hover]:!text-white [&_a:visited]:!text-white [&_a:active]:!text-white">
+        )}
+        
+        {/* Metin içerik bölümü - Responsive genişlikte */}
+        <div className="mx-auto max-w-xl lg:max-w-2xl xl:max-w-3xl px-6 sm:px-8 md:px-10 py-10">
+          <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none text-sm md:text-base [&_a]:!text-white [&_a]:!no-underline [&_a:hover]:!text-white [&_a:visited]:!text-white [&_a:active]:!text-white [&_p]:text-sm [&_p]:md:text-base [&_h2]:text-lg [&_h2]:md:text-xl [&_h3]:text-base [&_h3]:md:text-lg [&_ul]:text-sm [&_ul]:md:text-base [&_ol]:text-sm [&_ol]:md:text-base [&_li]:text-sm [&_li]:md:text-base">
             {parsedContent ? (
               <EditorRenderer data={parsedContent} />
             ) : isHtmlContent ? (

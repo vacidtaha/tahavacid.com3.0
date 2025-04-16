@@ -33,14 +33,21 @@ export default function App({ Component, pageProps }: AppProps) {
   
   // Admin sayfaları veya araştırma detay sayfalarında Layout kullanma
   if (isResearchDetailPage || isAdminPage) {
-    return <Component {...pageProps} />;
+    return (
+      <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, orientation=portrait" />
+        </Head>
+        <Component {...pageProps} />
+      </>
+    );
   }
   
   return (
     <>
       <Head>
         <link rel="icon" href="/images/logo2.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, orientation=portrait" />
       </Head>
       <Layout>
         <Component {...pageProps} />
