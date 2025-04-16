@@ -1,3 +1,12 @@
+## [1.0.2](https://github.com/vacidtaha/tahavacid.com/compare/v1.0.1...v1.0.2) (2025-04-16)
+
+
+### Bug Fixes
+
+* ana sayfa uyumsuzluğu düzeltildi ([9a2a283](https://github.com/vacidtaha/tahavacid.com/commit/9a2a2831893108fcbc77c13a0ac7683ba2f01a74))
+* menü tasarımı güncellendi search eklendi ([6c85d02](https://github.com/vacidtaha/tahavacid.com/commit/6c85d026128225940aebccacb9a0856ff5a37815))
+* reserch sayfası yeniden orantılandı ([c809183](https://github.com/vacidtaha/tahavacid.com/commit/c809183b10bf05560aca6a34791f9d2c7cc503a9))
+
 ## [1.0.1](https://github.com/vacidtaha/tahavacid.com/compare/v1.0.0...v1.0.1) (2025-04-15)
 
 
