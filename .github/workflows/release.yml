@@ -46,10 +46,16 @@ jobs:
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /var/www/tahavacid.com
-            git pull origin main
-            npm ci
-            npm run build
-            pm2 restart tahavacid.com
+                  echo "🚀 SSH bağlantısı başarılı"
+                  cd /var/www/tahavacid.com || { echo "❌ klasör bulunamadı"; exit 1; }
+                  echo "📦 Kod çekiliyor"
+                  git pull origin main || { echo "❌ git pull hata verdi"; exit 1; }
+                  echo "🔧 Bağımlılıklar kuruluyor"
+                  npm ci || { echo "❌ npm ci hata verdi"; exit 1; }
+                  echo "🧱 Proje build ediliyor"
+                  npm run build || { echo "❌ Build hata verdi"; exit 1; }
+                  echo "♻️ pm2 restart"
+                  pm2 restart tahavacid.com || { echo "❌ pm2 restart hata verdi"; exit 1; }
+                  echo "✅ Deploy tamamlandı"
           envs: SUPABASE_URL,SUPABASE_ANON_KEY
           capture_stdout: true
