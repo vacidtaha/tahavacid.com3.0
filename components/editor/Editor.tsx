@@ -45,25 +45,45 @@ const Editor: React.FC<EditorProps> = ({
       // Veri kontrolü ve temizliği yapılıyor
       if (savedData && savedData.blocks) {
         // Her bloğu kontrol et ve temizle
-        savedData.blocks = savedData.blocks.map((block: any) => {
-          // Text içeren bloklar için kontrol
-          if (block.type === 'paragraph' || block.type === 'header') {
-            // Eğer data ya da text özelliği yoksa, oluştur
-            if (!block.data) {
-              block.data = {};
-            }
-            
+        savedData.blocks = savedData.blocks.filter((block: any) => {
+          // Blok tipini ve data varlığını kontrol et
+          if (!block || !block.type || block.data === undefined || block.data === null) {
+            console.warn(`Geçersiz blok atlanıyor: ${JSON.stringify(block)}`);
+            return false;
+          }
+          
+          // Paragraf bloklarını kontrol et
+          if (block.type === 'paragraph') {
+            if (!block.data) block.data = {};
             if (block.data.text === undefined || block.data.text === null) {
               block.data.text = '';
             }
+            // Boş nesne olmadığını kontrol et
+            return true;
           }
-          return block;
+          
+          // Image bloklarını kontrol et
+          if (block.type === 'image') {
+            if (!block.data) block.data = {};
+            if (!block.data.file || typeof block.data.file !== 'object') {
+              console.warn('Geçersiz resim bloğu atlanıyor: Dosya verisi eksik');
+              return false;
+            }
+            
+            if (!block.data.file.url || typeof block.data.file.url !== 'string') {
+              console.warn('Geçersiz resim bloğu atlanıyor: URL eksik veya geçersiz');
+              return false;
+            }
+            
+            // Diğer gerekli alanları varsayılan değerlerle doldur
+            if (!block.data.caption) block.data.caption = '';
+            if (!block.data.withBorder) block.data.withBorder = false;
+            if (!block.data.withBackground) block.data.withBackground = false;
+            if (!block.data.stretched) block.data.stretched = false;
+          }
+          
+          return true;
         });
-        
-        // Geçersiz blokları filtrele
-        savedData.blocks = savedData.blocks.filter((block: any) => 
-          block && block.type && block.data !== undefined && block.data !== null
-        );
         
         // Son blok kontrolü ve ekleme
         if (savedData.blocks.length === 0) {
@@ -281,7 +301,19 @@ const Editor: React.FC<EditorProps> = ({
                 uploader: new ImageUploader(),
                 captionPlaceholder: 'Görsel açıklaması',
                 buttonContent: 'Görsel Yükle',
-                accepts: ['image/*']
+                accepts: ['image/*'],
+                types: 'image/*',
+                // Yükleme sırasında görüntülenecek iletişim kutusu metinleri
+                additionalRequestData: {
+                  author: 'Editor'
+                },
+                // Maksimum dosya boyutu - 5MB
+                fileSizeLimit: 5 * 1024 * 1024, 
+                // Yükleme başarısız olduğunda hata göster
+                onUploadError: (e: Error) => {
+                  console.error('Görsel yükleme hatası:', e);
+                  alert('Görsel yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+                }
               }
             },
             embed: {

@@ -185,6 +185,8 @@ export async function deleteResearch(id: string) {
 // Dosya yükleme fonksiyonu
 export async function uploadFile(file: File, bucket: string = 'images') {
   try {
+    console.log('Supabase uploadFile çağrıldı:', file.name, file.type, file.size, 'bucket:', bucket);
+    
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
@@ -196,6 +198,8 @@ export async function uploadFile(file: File, bucket: string = 'images') {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     const filePath = `${fileName}`;
+
+    console.log('Yükleme için dosya yolu:', filePath);
 
     const { data, error } = await supabase.storage
       .from(bucket)
@@ -209,10 +213,14 @@ export async function uploadFile(file: File, bucket: string = 'images') {
       throw error;
     }
 
+    console.log('Dosya başarıyla yüklendi:', data);
+
     // Dosya URL'ini döndür
     const { data: urlData } = supabase.storage
       .from(bucket)
       .getPublicUrl(filePath);
+
+    console.log('Dosyanın genel URL\'i:', urlData.publicUrl);
 
     return {
       url: urlData.publicUrl,

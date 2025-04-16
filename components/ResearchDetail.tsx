@@ -1,6 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Research } from '../lib/supabase';
+import dynamic from 'next/dynamic';
+import { EditorJSData } from './editor/EditorConfig';
+
+// Dinamik olarak EditorJS renderer'ı yükle
+const EditorRenderer: React.ComponentType<{data: EditorJSData}> = dynamic(
+  () => import('@/components/editor/EditorRenderer'),
+  {
+    ssr: false, 
+    loading: () => <div className="animate-pulse bg-gray-700 h-32 rounded-md"></div>
+  }
+);
 
 // ResearchDetail bileşeni props tanımı
 interface ResearchDetailProps {
@@ -11,6 +22,50 @@ interface ResearchDetailProps {
 const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
   const [scrolled, setScrolled] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [parsedContent, setParsedContent] = useState<EditorJSData | null>(null);
+
+  // İçeriği parse et
+  useEffect(() => {
+    try {
+      if (typeof research.content === 'string') {
+        // String ise JSON olarak parse et
+        try {
+          const contentObj = JSON.parse(research.content);
+          console.log('İçerik başarıyla parse edildi:', contentObj);
+          
+          // EditorJS formatını doğrula
+          if (contentObj && contentObj.blocks && Array.isArray(contentObj.blocks)) {
+            setParsedContent(contentObj as EditorJSData);
+          } else {
+            console.error('İçerik EditorJS formatında değil:', contentObj);
+            // Hatalı format durumunda null döndür
+            setParsedContent(null);
+          }
+        } catch (parseError) {
+          console.error('JSON parse hatası:', parseError);
+          setParsedContent(null);
+        }
+      } else if (typeof research.content === 'object') {
+        // Zaten obje ise doğrudan kullan
+        console.log('İçerik zaten obje formatında:', research.content);
+        // EditorJS formatını doğrula
+        const contentObj = research.content as any;
+        if (contentObj && contentObj.blocks && Array.isArray(contentObj.blocks)) {
+          setParsedContent(contentObj as EditorJSData);
+        } else {
+          console.error('İçerik EditorJS formatında değil:', research.content);
+          setParsedContent(null);
+        }
+      } else {
+        console.error('İçerik ne string ne de obje:', typeof research.content);
+        setParsedContent(null);
+      }
+    } catch (error) {
+      console.error('İçerik parse edilirken hata oluştu:', error);
+      // Hata durumunda ham içeriği string olarak göster
+      setParsedContent(null);
+    }
+  }, [research.content]);
 
   // Sayfa scroll edildiğinde geri düğmesini göster/gizle
   useEffect(() => {
@@ -48,12 +103,12 @@ const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
         </Link>
       </div>
 
-      {/* Minimal başlık bölümü */}
-      <div className="bg-black text-center pt-12 pb-8">
+      {/* Minimal başlık bölümü - Padding artırıldı ve yazı boyutları büyütüldü */}
+      <div className="bg-black text-center pt-20 pb-12">
         <div className="container mx-auto px-4">
-          <div className="text-gray-400 text-xs mb-2">{formatDate(research.created_at)}</div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{research.title}</h1>
-          <p className="text-base text-gray-300 max-w-2xl mx-auto mb-4">{research.description}</p>
+          <div className="text-gray-400 text-sm mb-3">{formatDate(research.created_at)}</div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">{research.title}</h1>
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-6">{research.description}</p>
         </div>
       </div>
 
@@ -72,14 +127,26 @@ const ResearchDetail: React.FC<ResearchDetailProps> = ({ research }) => {
         </div>
       )}
 
-      {/* İçerik alanı */}
+      {/* İçerik alanı - Metin boyutu büyütüldü ve sınırları genişletildi */}
       <div className="bg-black">
-        <div className="container mx-auto max-w-2xl px-8 sm:px-12 py-12">
-          <div className="prose prose-invert max-w-none">
-            <div 
-              dangerouslySetInnerHTML={{ __html: research.content }}
-              className="[&_img]:w-full [&_img]:rounded-lg [&_img]:my-6 [&_img]:mx-auto [&_img]:max-h-[500px] [&_img]:object-contain [&_img]:max-w-3xl [&_img]:-mx-[15%] md:[&_img]:-mx-[25%] [&_pre]:max-w-3xl [&_pre]:-mx-[15%] md:[&_pre]:-mx-[25%] [&_pre]:rounded-lg [&_pre]:overflow-x-auto"
-            />
+        <div className="container mx-auto max-w-4xl px-6 sm:px-10 py-14">
+          <div className="prose prose-invert prose-lg max-w-none [&_a]:!text-white [&_a]:!no-underline [&_a:hover]:!text-white [&_a:visited]:!text-white [&_a:active]:!text-white">
+            {parsedContent ? (
+              <EditorRenderer data={parsedContent} />
+            ) : (
+              <div className="text-red-500 bg-red-100 p-4 rounded-md mb-4">
+                <h3 className="font-bold">İçerik Görüntüleme Hatası</h3>
+                <p>İçerik düzgün biçimde görüntülenemiyor. Lütfen yönetici ile iletişime geçin.</p>
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-sm">Teknik Detaylar</summary>
+                  <pre className="text-xs mt-2 p-2 bg-red-50 rounded overflow-auto">
+                    {typeof research.content === 'string' 
+                      ? research.content.substring(0, 500) + (research.content.length > 500 ? '...' : '') 
+                      : JSON.stringify(research.content, null, 2)}
+                  </pre>
+                </details>
+              </div>
+            )}
           </div>
         </div>
       </div>
