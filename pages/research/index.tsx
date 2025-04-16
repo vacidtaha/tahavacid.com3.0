@@ -78,12 +78,12 @@ export default function ResearchListPage({ researches }: ResearchListPageProps) 
       
       <div className="container mx-auto px-8 sm:px-12 lg:px-20 pt-20 pb-10 max-w-6xl">
         {/* Ana başlık - Görüntüdeki gibi büyük ve sade */}
-        <h1 className="text-5xl font-bold text-white mb-4">
+        <h1 className="text-4xl font-bold text-white mb-4">
           Araştırmalar
         </h1>
         
         {/* Sıralama seçenekleri */}
-        <div className="flex items-center mb-10">
+        <div className="flex items-center justify-end mb-10">
           <DropdownMenu options={sortOptions}>
             {sortOptionText[sortBy]}
           </DropdownMenu>
@@ -94,22 +94,22 @@ export default function ResearchListPage({ researches }: ResearchListPageProps) 
           {filteredAndSortedResearches.length > 0 ? (
             <div className="space-y-6">
               {filteredAndSortedResearches.map((research) => (
-                <div key={research.id} className="ml-0 border-b border-gray-800 pb-6">
-                  <Link href={`/research/${research.slug}`} className="block hover:bg-gray-900 transition-colors duration-300 rounded-xl p-4 -mx-4">
+                <div key={research.id} className="ml-0 border-b border-gray-800 group hover:border-gray-600 transition-colors duration-300 pb-4">
+                  <Link href={`/research/${research.slug}`} className="block hover:bg-[#212529] transition-colors duration-300 rounded-xl p-3 -mx-3">
                     {research.image_url && (
-                      <div className="mb-3 rounded-lg overflow-hidden">
+                      <div className="mb-2 rounded-lg overflow-hidden">
                         <img 
                           src={research.image_url} 
                           alt={research.title} 
-                          className="w-full h-40 object-cover"
+                          className="w-full h-32 object-cover"
                         />
                       </div>
                     )}
                     <div className="flex flex-col mb-2">
-                      <h2 className="text-xl font-semibold text-white">{research.title}</h2>
+                      <h2 className="text-lg font-semibold text-white">{research.title}</h2>
                       <span className="text-gray-400 text-xs mt-1">{formatDate(research.created_at)}</span>
                     </div>
-                    <p className="text-gray-400 max-w-prose text-sm line-clamp-2">{research.description}</p>
+                    <p className="text-gray-400 max-w-prose text-xs line-clamp-2">{research.description}</p>
                   </Link>
                 </div>
               ))}
