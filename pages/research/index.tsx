@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { Research, getResearches } from '../../lib/supabase';
 import { DropdownMenu } from '@/components/components/ui/dropdown-menu';
@@ -127,8 +127,8 @@ export default function ResearchListPage({ researches }: ResearchListPageProps) 
   );
 }
 
-// Statik veri getirme
-export const getStaticProps: GetStaticProps = async () => {
+// Sunucu tarafında veri getirme (her istek için canlı veri)
+export const getServerSideProps: GetServerSideProps = async () => {
   try {
     // Supabase'den verileri getir
     const researches = await getResearches();
@@ -137,8 +137,6 @@ export const getStaticProps: GetStaticProps = async () => {
       props: {
         researches,
       },
-      // Her 10 dakikada bir yeniden oluştur
-      revalidate: 600,
     };
   } catch (error) {
     console.error('Verileri alırken hata oluştu:', error);
@@ -148,7 +146,6 @@ export const getStaticProps: GetStaticProps = async () => {
       props: {
         researches: [],
       },
-      revalidate: 60, // Hata durumunda daha sık kontrol et
     };
   }
 }; 
