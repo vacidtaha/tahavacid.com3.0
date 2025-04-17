@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/vacidtaha/tahavacid.com/compare/v1.3.2...v1.3.3) (2025-04-17)
+
+
+### Bug Fixes
+
+* reserch indexleme sorunu çözüldü ([e9d3134](https://github.com/vacidtaha/tahavacid.com/commit/e9d3134c8542383060c3bff76e9d67a1060ef06e))
+
 ## [1.3.2](https://github.com/vacidtaha/tahavacid.com/compare/v1.3.1...v1.3.2) (2025-04-16)
 
 
