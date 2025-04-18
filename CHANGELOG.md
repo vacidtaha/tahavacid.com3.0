@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/vacidtaha/tahavacid.com/compare/v1.3.3...v1.3.4) (2025-04-18)
+
+
+### Bug Fixes
+
+* deneme sayfası eklendi ([6158e44](https://github.com/vacidtaha/tahavacid.com/commit/6158e447cec2d0e59e9648ffc1ddd9330c8678f8))
+
 ## [1.3.3](https://github.com/vacidtaha/tahavacid.com/compare/v1.3.2...v1.3.3) (2025-04-17)
 
 
