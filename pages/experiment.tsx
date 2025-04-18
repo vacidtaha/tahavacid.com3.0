@@ -110,7 +110,7 @@ Sayfanın kullanıcı kitlesi daha teknik mi, genel izleyici mi? Ona göre tonu 
       </Head>
 
       {/* Splash Cursor Efekti */}
-      <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none">
+      <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none hidden md:block">
         <SplashCursor 
           SPLAT_FORCE={3000} 
           COLOR_UPDATE_SPEED={5} 
