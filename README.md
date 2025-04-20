@@ -117,3 +117,8 @@ https://tahavacid.com/research
 ```
 
 Bu değişikliklerle birlikte, yeni eklenen araştırmalar Research sayfasında hemen görünecektir, çünkü artık sayfa her yüklendiğinde en güncel veriler Supabase'den çekilecektir.
+
+
+
+
+YVHVHBVHYBVYHVGHVHVHVHVHVH55
