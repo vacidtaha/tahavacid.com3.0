@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/vacidtaha/tahavacid.com/compare/v1.3.4...v1.3.5) (2025-05-01)
+
+
+### Bug Fixes
+
+* menü düzeltmesi ([8432a06](https://github.com/vacidtaha/tahavacid.com/commit/8432a06adf36fe8e516777558bef5b75b90e9245))
+
 ## [1.3.4](https://github.com/vacidtaha/tahavacid.com/compare/v1.3.3...v1.3.4) (2025-04-18)
 
 
