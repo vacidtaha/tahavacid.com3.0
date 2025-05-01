@@ -11,7 +11,6 @@ const Header: React.FC = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [isLoginClicked, setIsLoginClicked] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
 
   // Aktif rotaya göre stil veren NavLink bileşeni
@@ -97,25 +96,13 @@ const Header: React.FC = () => {
 
   // Menü öğesinin arka plan stilini belirle
   const getMenuItemStyle = (path: string) => {
-    // Giriş Yap butonu için sabit pastel kırmızı arka plan, tıklanınca yeşil
+    // Giriş Yap butonu için sabit beyaz arka plan, tıklanınca yeşil
     if (path === '/login') {
-      return isLoginClicked ? 'bg-green-500/40' : 'bg-red-500/15';
+      return isLoginClicked ? 'bg-green-500/40' : 'bg-white';
     }
     
     // Hover efektlerini kaldırdık
     return '';
-  };
-
-  // Arama işlemi
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // Arama işlemini gerçekleştir
-      console.log('Aranan:', searchQuery);
-      // Örnek olarak araştırma sayfasına yönlendir
-      router.push(`/research?q=${encodeURIComponent(searchQuery)}`);
-      setIsMenuOpen(false);
-    }
   };
 
   return (
@@ -165,26 +152,6 @@ const Header: React.FC = () => {
                 className="w-auto h-auto max-h-[40px]"
               />
             </div>
-            
-            {/* Arama formu - Sadece mobilde görünür */}
-            <form onSubmit={handleSearch} className="mb-8 mt-6">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-3 text-sm text-left focus:outline-none rounded-lg text-[#ced4da] bg-[#212529]"
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                  style={{
-                    backgroundColor: '#212529',
-                    color: '#ced4da',
-                    fontSize: '16px' // Prevents zoom on iOS
-                  }}
-                  inputMode="search"
-                />
-              </div>
-            </form>
           </div>
           
           {/* Menü Linkleri - Mobilde normal akış, desktop'ta dikeyde ortada */}
@@ -221,15 +188,15 @@ const Header: React.FC = () => {
           <div className="mt-auto px-6 pb-10 sm:pb-6 sm:mt-0">
             <div className="max-w-[200px] w-full sm:mx-auto">
               <button 
-                className={`py-2 px-4 text-sm text-left rounded-lg w-auto block flex items-center justify-start 
+                className={`py-2 px-4 text-sm rounded-full w-auto block flex items-center justify-start 
                   sm:text-center sm:w-full sm:justify-center
-                  bg-[#212529] text-[#ced4da] 
-                  transition-all duration-300 ease-in-out sm:rounded-lg sm:bg-red-500/15 sm:text-red-400 sm:hover:bg-red-500/25`}
+                  bg-white text-gray-800
+                  transition-all duration-300 ease-in-out sm:rounded-full`}
                 onClick={handleLoginClick}
                 disabled={isLoginClicked}
                 style={{
-                  backgroundColor: '#212529',
-                  color: '#ced4da',
+                  backgroundColor: 'white',
+                  color: '#333',
                 }}
               >
                 <span>{isLoginClicked ? "Yönlendiriliyor..." : "Giriş Yap"}</span>
