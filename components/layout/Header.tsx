@@ -91,7 +91,7 @@ const Header: React.FC = () => {
     // 1.5 saniye sonra yönlendirme ve menüyü kapatma
     setTimeout(() => {
       setIsMenuOpen(false);
-      router.push('/login');
+      router.push('/admin/login');
     }, 1500);
   };
 

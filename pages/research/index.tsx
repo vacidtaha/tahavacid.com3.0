@@ -72,8 +72,8 @@ export default function ResearchListPage({ researches }: ResearchListPageProps) 
   return (
     <>
       <Head>
-        <title>Araştırmalar | Vacid</title>
-        <meta name="description" content="Vacid'in yapay zeka ve teknoloji alanındaki tüm araştırmaları" />
+        <title>Vacid Advanced Science and Technology Institute</title>
+        <meta name="description" content="Vacid Advanced Science and Technology Institute - Research and development initiatives" />
       </Head>
       
       <div className="container mx-auto px-8 sm:px-12 lg:px-20 pt-20 pb-10 max-w-6xl">

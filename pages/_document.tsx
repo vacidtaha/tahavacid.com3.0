@@ -5,7 +5,8 @@ export default function Document() {
     <Html lang="tr">
       <Head>
         <meta charSet="utf-8" />
-        <meta name="description" content="Vacid - Yapay zeka ve teknoloji araştırmaları" />
+        <title>Vacid Advanced Science and Technology Institute</title>
+        <meta name="description" content="Vacid Advanced Science and Technology Institute - Cutting-edge research and technology" />
         <link rel="icon" href="/favicon.ico" />
         <meta
           httpEquiv="Content-Security-Policy"

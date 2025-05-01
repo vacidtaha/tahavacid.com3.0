@@ -13,8 +13,8 @@ export default function HomePage({}: HomePageProps) {
   return (
     <>
       <Head>
-        <title>Vacid | Yapay Zeka ve Teknoloji Araştırmaları</title>
-        <meta name="description" content="Vacid, yapay zeka ve teknoloji alanında yenilikçi araştırmalar yapan bir araştırma kuruluşudur." />
+        <title>Vacid Advanced Science and Technology Institute</title>
+        <meta name="description" content="Vacid Advanced Science and Technology Institute - Cutting-edge research and technology solutions" />
       </Head>
 
       {/* Hero alanı - Logo ile tam ekran giriş */}
