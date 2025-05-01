@@ -88,7 +88,7 @@ export default function NewResearch() {
         
         setUser(currentUser);
       } catch (error) {
-        console.error('Kullanıcı bilgisi alınırken hata:', error);
+        console.error('Kullanıcı bilgisi alınırken hata oluştu:', error);
         router.push('/admin/login');
       } finally {
         setLoading(false);
